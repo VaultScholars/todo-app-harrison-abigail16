@@ -59,10 +59,25 @@ EXPECTED OUTPUT OF renderTasks():
 // - Create an <li> for each task using createTaskElement()
 // - Add each <li> to the <ul>
 // - Show the empty state message when there are no tasks
-function renderTasks(tasks, listElement, emptyStateElement) {
+// const taskList = document.getElementById("task-list");
+//const emptyState = document.getElementById("empty-state");
+
+
+function renderTasks(tasks, taskList, emptyState) {
+  taskList.innerHTML = ""; 
+  if (tasks.length === 0) {
+    emptyState.style.display = "block";
+    return; 
+  } else {
+    emptyState.style.display = "none";
+  }
+
+  for(let i = 0;  i < tasks.length; i++) {
+    const taskHTML = createTaskElement(tasks[i]);
+    taskList.innerHTML += taskHTML;
+  }
   // TODO: Implement rendering logic
 }
-
 
 // This function should:
 // - Create and return ONE <li> element following the structure above
@@ -71,7 +86,41 @@ function renderTasks(tasks, listElement, emptyStateElement) {
 // - Make the checkbox checked if the task is completed
 // - NOT add event listeners (app.js will handle that)
 function createTaskElement(task) {
+  let metaText = "";
+  if (task.category) {
+    metaText += task.category;
+  }
+
+  if (task.category && task.dueDate){
+    metaText += " | ";
+  }
+
+  if (task.dueDate) {
+    metaText += task.dueDate;
+  }
+  let metaHTML = "";
+  if (metaText !== "") {
+    metaHTML = `<p class="task-meta">${metaText}</p>`;
+  }
   // TODO: Implement element creation logic
+  const checked = task.completed ? "checked" : "";
+  const completedClass = task.completed ? "completed" : "";
+
+  return `
+  <li class="task-item ${completedClass}" data-id ="${task.id}">
+    <div class="task-item-left">
+    
+    <div class = "task-main">
+      <p class="task-title">${task.title}</p>
+      ${metaHTML}
+    </div>
+    </div>
+
+    <div class = "task-actions">
+      <button type="button" class = "task-delete-btn">Delete</button>
+    </div>
+  </li>
+  `;
 }
 
 
@@ -80,5 +129,11 @@ function createTaskElement(task) {
 // - Reset the form
 // - Put focus back on the task title input
 function clearTaskForm(form) {
+  form.reset();
+  const titleInput = document.getElementById("task-title");
+  if (titleInput) {
+    titleInput.focus();
+  }
   // TODO: Reset the form and focus the title input
 }
+
