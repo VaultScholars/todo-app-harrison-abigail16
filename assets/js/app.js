@@ -13,17 +13,31 @@ document.addEventListener("DOMContentLoaded", () => {
   const taskList = document.getElementById("task-list");
   const emptyState = document.getElementById("empty-state");
 
+  const titleInput  = document.getElementById("task-title");
+  const categoryInput = document.getElementById("task-category");
+  const dueDateInput = document.getElementById("task-due-date");
   // When starting the app:
   // - Load tasks from localStorage
   // - Update nextTaskId so it doesn't conflict
   // - Show tasks on the page
   // TODO: Load tasks and render them
+  tasks = loadTasks();
 
+  let highestID = 0;
 
+  for (let i = 0; i < tasks.length; i++){
+    if (tasks[i].id > highestID) {
+      highestID = tasks[i].id;
+    }
+  }
+  nextTaskId =highestID + 1;
+
+  renderTasks(tasks, taskList, emptyState);
 
   // When the user submits the form to add a task:
   form.addEventListener("submit", (event) => {
     event.preventDefault();
+
 
     // What should happen here:
     // - Read values from the form (title, category, due date)
@@ -34,6 +48,29 @@ document.addEventListener("DOMContentLoaded", () => {
     // - Update the page to show the new task
     // - Clear the form
     // TODO: Add a new task
+
+    const title = titleInput.value;
+    const category = categoryInput.value;
+    const dueDate = dueDateInput.value;
+
+    if (title ==="") {
+      return;
+    }
+
+    const newTask = {
+      id: nextTaskId,
+      title: title,
+      category: category,
+      dueDate: dueDate,
+      completed: false
+    };
+
+    tasks.push(newTask);
+
+    nextTaskId++;
+
+    saveTasks(tasks);
+    renderTasks(tasks, taskList, emptyState);
   });
 
 
@@ -54,6 +91,14 @@ document.addEventListener("DOMContentLoaded", () => {
       // - Save updated tasks
       // - Update the page
       // TODO: Toggle completed state
+      for (let i = 0; i < tasks.length; i++) {
+        if (tasks[i].id === taskId) {
+          tasks[i].completed = !tasks[i].completed;
+          break;
+        }
+      }
+    saveTasks(tasks);
+    renderTasks(tasks, taskList, emptyState);
       return;
     }
 
@@ -64,6 +109,17 @@ document.addEventListener("DOMContentLoaded", () => {
       // - Save updated tasks
       // - Update the page
       // TODO: Delete the task
+      const updatedTasks = [];
+
+      for (let i = 0; i < tasks.length; i++) {
+        if (tasks[i].id !== taskId) {
+          updatedTasks.push(tasks[i]);
+        }
+      }
+
+      tasks = updatedTasks;
+      saveTasks(tasks);
+      renderTasks(tasks,taskList, emptyState);
       return;
     }
   });
